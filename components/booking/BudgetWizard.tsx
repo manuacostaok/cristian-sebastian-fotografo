@@ -81,7 +81,7 @@ export function BudgetWizard({
 
   async function handleSubmit() {
     setSubmitted(true);
-    await fetch("/api/leads", {
+    await fetch("/api/quotes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -91,9 +91,9 @@ export function BudgetWizard({
         eventType: form.eventType,
         eventDate: form.eventDate,
         location: form.location,
-        message: `Presupuesto vía wizard — ${selectedService?.name ?? "Cobertura personalizada"}${
-          selectedExtras.length ? " + " + selectedExtras.map((e) => e.name).join(", ") : ""
-        }`,
+        requiresCustomQuote: quote?.requiresCustomQuote ?? true,
+        items: quote?.items ?? [],
+        total: quote?.total ?? 0,
       }),
     }).catch(() => {});
   }

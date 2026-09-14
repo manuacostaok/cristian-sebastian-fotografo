@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PageHeader, Card } from "@/components/admin/Page";
 import { prisma } from "@/lib/prisma";
-import { safeQuery } from "@/lib/safe-query";
+import { safeQuery, isDatabaseConfigured } from "@/lib/safe-query";
 import { formatDateLong } from "@/lib/utils";
 
 export default async function AdminDashboardPage() {
@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
     safeQuery(() => prisma.client.count(), 0),
   ]);
 
-  const dbConnected = process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("user:password");
+  const dbConnected = isDatabaseConfigured();
 
   return (
     <div>

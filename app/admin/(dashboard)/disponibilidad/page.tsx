@@ -60,7 +60,7 @@ export default async function DisponibilidadAdminPage() {
               <Th>Fecha</Th>
               <Th>Estado</Th>
               <Th>Nota interna</Th>
-              <Th></Th>
+              <Th>{" "}</Th>
             </tr>
           </thead>
           <tbody>
