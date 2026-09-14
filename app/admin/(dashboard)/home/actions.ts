@@ -17,6 +17,7 @@ export async function updateHomeConfig(formData: FormData) {
     ctaFinalText: String(formData.get("ctaFinalText") ?? ""),
     featuredProjectIds: formData.getAll("featuredProjectIds").map(String),
     upcomingEventId: String(formData.get("upcomingEventId") ?? "") || null,
+    heroPhotoId: String(formData.get("heroPhotoId") ?? "") || null,
     showFeatured: formData.get("showFeatured") === "on",
     showUpcoming: formData.get("showUpcoming") === "on",
     showTestimonials: formData.get("showTestimonials") === "on",

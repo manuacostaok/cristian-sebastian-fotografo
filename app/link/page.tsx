@@ -21,7 +21,12 @@ export default async function LinkInBioPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-ink px-6 py-16 text-paper">
-      <PhotoFrame seed="link-in-bio" className="absolute inset-0 h-full w-full opacity-60" />
+      <PhotoFrame
+        seed="link-in-bio"
+        url="https://res.cloudinary.com/ex5a6g9w/image/upload/v1789404449/christian-sebastian/bfx8st4jsbcwv5m3u7ho.jpg"
+        alt="Christian Sebastián"
+        className="absolute inset-0 h-full w-full opacity-60"
+      />
       <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/80 to-ink" />
 
       <div className="relative z-10 flex w-full max-w-sm flex-col items-center text-center">

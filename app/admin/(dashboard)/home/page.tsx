@@ -4,10 +4,11 @@ import { safeQuery } from "@/lib/safe-query";
 import { updateHomeConfig } from "./actions";
 
 export default async function HomeAdminPage() {
-  const [config, projects, events] = await Promise.all([
+  const [config, projects, events, photos] = await Promise.all([
     safeQuery(() => prisma.homeConfig.findUnique({ where: { id: "home" } }), null),
     safeQuery(() => prisma.project.findMany({ where: { published: true }, orderBy: { date: "desc" } }), []),
     safeQuery(() => prisma.event.findMany({ orderBy: { date: "desc" } }), []),
+    safeQuery(() => prisma.photo.findMany({ orderBy: { createdAt: "desc" }, take: 100 }), []),
   ]);
 
   return (
@@ -24,6 +25,12 @@ export default async function HomeAdminPage() {
               <input name="heroCtaPrimary" defaultValue={config?.heroCtaPrimary} className="field flex-1" placeholder="CTA principal" />
               <input name="heroCtaSecondary" defaultValue={config?.heroCtaSecondary} className="field flex-1" placeholder="CTA secundario" />
             </div>
+            <select name="heroPhotoId" defaultValue={config?.heroPhotoId ?? ""} className="field">
+              <option value="">Sin foto (gradiente de marca)</option>
+              {photos.map((p) => (
+                <option key={p.id} value={p.id}>{p.alt || p.id}</option>
+              ))}
+            </select>
           </fieldset>
 
           <fieldset className="flex flex-col gap-4">

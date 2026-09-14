@@ -71,7 +71,12 @@ export default async function SobreMiPage() {
               </ButtonLink>
             </div>
           </div>
-          <RevealPhoto seed="sobre-mi" alt="Christian Sebastián" className="aspect-[4/5] w-full" />
+          <RevealPhoto
+            seed="sobre-mi"
+            url="https://res.cloudinary.com/ex5a6g9w/image/upload/v1789404454/christian-sebastian/cidjwuxqioya9yge5rj1.jpg"
+            alt="Fotógrafo con cámara vintage"
+            className="aspect-[4/5] w-full"
+          />
         </div>
 
         <div className="mt-28 border-t border-paper-line pt-20 sm:mt-36">

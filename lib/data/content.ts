@@ -341,12 +341,17 @@ export async function getHomeConfig(): Promise<HomeConfigData> {
   const row = await safeQuery(() => prisma.homeConfig.findUnique({ where: { id: "home" } }), null);
   if (!row) return HOME_CONFIG;
 
+  const heroPhoto = row.heroPhotoId
+    ? await safeQuery(() => prisma.photo.findUnique({ where: { id: row.heroPhotoId! } }), null)
+    : null;
+
   return {
     heroTitle: row.heroTitle,
     heroSubtitle: row.heroSubtitle,
     heroCtaPrimary: row.heroCtaPrimary,
     heroCtaSecondary: row.heroCtaSecondary,
     heroSeed: "hero-main",
+    heroUrl: heroPhoto?.url,
     statsYears: row.statsYears,
     statsEvents: row.statsEvents,
     statsLocation: row.statsLocation,
