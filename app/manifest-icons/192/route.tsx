@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { CameraMark } from "@/lib/icons/camera-mark";
 
 export function GET() {
   return new ImageResponse(
@@ -8,22 +9,26 @@ export function GET() {
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          gap: 10,
           background: "linear-gradient(155deg, #1b1712 0%, #14110f 60%, #2c2013 100%)",
         }}
       >
+        <CameraMark size={80} strokeWidth={1.6} />
         <span
           style={{
-            fontSize: 112,
+            fontSize: 36,
             fontWeight: 700,
             color: "#c9a15a",
             fontFamily: "Georgia, 'Times New Roman', serif",
             fontStyle: "italic",
+            letterSpacing: 1,
             lineHeight: 1,
           }}
         >
-          C
+          CS
         </span>
       </div>
     ),
