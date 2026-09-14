@@ -11,6 +11,13 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Cancelado",
 };
 
+const BALANCE_LABELS: Record<string, string> = {
+  PENDING: "Sin pagar",
+  PARTIAL: "Seña pagada",
+  PAID: "Pagado",
+  OVERDUE: "Vencido",
+};
+
 export default async function EventosPage() {
   const [events, clients, categories] = await Promise.all([
     safeQuery(
@@ -62,6 +69,31 @@ export default async function EventosPage() {
                       <option key={value} value={value}>{label}</option>
                     ))}
                   </select>
+                  <select name="visibility" defaultValue={event.visibility} className="field w-36">
+                    <option value="PRIVATE">🔒 Privado</option>
+                    <option value="PUBLIC">🌐 Público</option>
+                  </select>
+                </div>
+                <div className="flex flex-wrap items-end gap-4 border-t border-paper-line pt-3">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-paper-muted">Precio total</span>
+                    <input name="totalPrice" type="number" defaultValue={event.totalPrice ? Number(event.totalPrice) : ""} className="field w-32" />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-paper-muted">Seña</span>
+                    <input name="depositAmount" type="number" defaultValue={event.depositAmount ? Number(event.depositAmount) : ""} className="field w-32" />
+                  </label>
+                  <label className="flex items-center gap-2 pb-2.5 text-sm">
+                    <input type="checkbox" name="depositPaid" defaultChecked={event.depositPaid} /> Seña pagada
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-[11px] uppercase tracking-[0.1em] text-paper-muted">Saldo</span>
+                    <select name="balanceStatus" defaultValue={event.balanceStatus} className="field w-36">
+                      {Object.entries(BALANCE_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
                 <textarea name="notes" defaultValue={event.notes ?? ""} rows={2} className="field" placeholder="Notas internas" />
                 <button type="submit" className="ml-auto border border-ink px-4 py-2 text-xs uppercase tracking-[0.1em] hover:bg-ink hover:text-paper">
@@ -99,6 +131,10 @@ export default async function EventosPage() {
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
+              </select>
+              <select name="visibility" defaultValue="PRIVATE" className="field w-36">
+                <option value="PRIVATE">🔒 Privado</option>
+                <option value="PUBLIC">🌐 Público</option>
               </select>
               <button type="submit" className="ml-auto border border-ink bg-ink px-4 py-2 text-xs uppercase tracking-[0.1em] text-paper hover:bg-gold hover:text-ink">
                 Crear evento

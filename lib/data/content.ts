@@ -387,6 +387,9 @@ export async function getUpcomingProject(): Promise<StoryProject | null> {
         }),
       null,
     );
+    // Never surface a private event publicly — even if the admin picked it
+    // as "upcoming" before flagging it public, or picked it by mistake.
+    if (event && event.visibility !== "PUBLIC") return null;
     if (event?.project) return mapProject(event.project);
     if (event) {
       return {

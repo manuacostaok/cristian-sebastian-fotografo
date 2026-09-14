@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import type { EventStatus } from "@prisma/client";
+import type { EventStatus, EventVisibility, BalanceStatus } from "@prisma/client";
 
 export async function createEvent(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
@@ -18,6 +18,7 @@ export async function createEvent(formData: FormData) {
       clientId: String(formData.get("clientId") ?? "") || null,
       categoryId: String(formData.get("categoryId") ?? "") || null,
       status: String(formData.get("status") ?? "PENDING") as EventStatus,
+      visibility: String(formData.get("visibility") ?? "PRIVATE") as EventVisibility,
     },
   });
   revalidatePath("/admin/eventos");
@@ -26,6 +27,9 @@ export async function createEvent(formData: FormData) {
 
 export async function updateEvent(formData: FormData) {
   const id = String(formData.get("id"));
+  const totalPrice = String(formData.get("totalPrice") ?? "");
+  const depositAmount = String(formData.get("depositAmount") ?? "");
+
   await prisma.event.update({
     where: { id },
     data: {
@@ -36,7 +40,12 @@ export async function updateEvent(formData: FormData) {
       clientId: String(formData.get("clientId") ?? "") || null,
       categoryId: String(formData.get("categoryId") ?? "") || null,
       status: String(formData.get("status") ?? "PENDING") as EventStatus,
+      visibility: String(formData.get("visibility") ?? "PRIVATE") as EventVisibility,
       notes: String(formData.get("notes") ?? "") || null,
+      totalPrice: totalPrice ? Number(totalPrice) : null,
+      depositAmount: depositAmount ? Number(depositAmount) : null,
+      depositPaid: formData.get("depositPaid") === "on",
+      balanceStatus: String(formData.get("balanceStatus") ?? "PENDING") as BalanceStatus,
     },
   });
   revalidatePath("/admin/eventos");
