@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { ImmersiveGallery } from "@/components/portfolio/ImmersiveGallery";
-import { ButtonLink } from "@/components/ui/Button";
+import { WhatsAppCtaLink } from "@/components/marketing/WhatsAppCtaLink";
+import { TrackPageView } from "@/components/analytics/TrackPageView";
 import { formatDateLong } from "@/lib/utils";
 import { portfolioMessage, buildWhatsAppLink } from "@/lib/whatsapp";
 import { getProjectBySlug, getCategories } from "@/lib/data/content";
@@ -42,6 +43,7 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
 
   return (
     <article>
+      <TrackPageView type="project_view" meta={{ slug: project.slug }} />
       <section className="relative flex h-[85svh] min-h-[520px] w-full items-end bg-ink text-paper">
         <PhotoFrame
           seed={project.coverSeed}
@@ -69,9 +71,9 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
             {project.description}
           </p>
           <div className="flex flex-col items-start gap-4 lg:items-end">
-            <ButtonLink href={whatsappHref} external variant="solid">
+            <WhatsAppCtaLink href={whatsappHref} variant="solid" context={`historia:${project.slug}`}>
               Quiero algo así
-            </ButtonLink>
+            </WhatsAppCtaLink>
             {project.credits && (
               <p className="text-xs text-paper-muted lg:text-right">{project.credits}</p>
             )}

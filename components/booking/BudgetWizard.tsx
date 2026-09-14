@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { cn, formatCurrencyARS, formatDateLong } from "@/lib/utils";
 import { computeQuote } from "@/lib/pricing";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { getStoredUtm } from "@/lib/analytics";
+import { track } from "@/lib/track";
 import type { ServiceOption, ExtraOption } from "@/lib/types";
 
 const EVENT_TYPES = ["15 años", "Cumpleaños 18", "Cumpleaños", "Boda", "Evento", "Sesión / Exteriores"];
@@ -48,6 +50,8 @@ export function BudgetWizard({
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(INITIAL);
   const [submitted, setSubmitted] = useState(false);
+  const [website, setWebsite] = useState(""); // honeypot
+  const startedTracked = useRef(false);
 
   const matchingServices = useMemo(
     () => services.filter((s) => !form.eventType || s.categoryTag === slugForEventType(form.eventType)),
@@ -61,6 +65,10 @@ export function BudgetWizard({
     : null;
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+    if (key === "eventType" && !startedTracked.current) {
+      startedTracked.current = true;
+      track("quote_started", { eventType: value as string });
+    }
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -94,8 +102,11 @@ export function BudgetWizard({
         requiresCustomQuote: quote?.requiresCustomQuote ?? true,
         items: quote?.items ?? [],
         total: quote?.total ?? 0,
+        website,
+        ...getStoredUtm(),
       }),
     }).catch(() => {});
+    track("quote_completed", { eventType: form.eventType, customQuote: quote?.requiresCustomQuote ?? true });
   }
 
   if (submitted) {
@@ -130,6 +141,15 @@ export function BudgetWizard({
 
   return (
     <div>
+      <input
+        type="text"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden"
+      />
       <ol className="mb-12 flex flex-wrap gap-x-6 gap-y-2">
         {STEPS.map((label, i) => (
           <li

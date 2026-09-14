@@ -33,36 +33,39 @@ model User {
 // ─────────────────────────────────────────────
 
 model Category {
-  id            String    @id @default(cuid())
-  name          String
-  slug          String    @unique
-  order         Int       @default(0)
-  active        Boolean   @default(true)
-  coverPhotoId  String?   @unique
-  coverPhoto    Photo?    @relation("CategoryCover", fields: [coverPhotoId], references: [id])
-  projects      Project[]
-  photos        Photo[]   @relation("CategoryPhotos")
-  events        Event[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  name         String
+  slug         String    @unique
+  order        Int       @default(0)
+  active       Boolean   @default(true)
+  coverPhotoId String?   @unique
+  coverPhoto   Photo?    @relation("CategoryCover", fields: [coverPhotoId], references: [id])
+  projects     Project[]
+  photos       Photo[]   @relation("CategoryPhotos")
+  events       Event[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Photo {
-  id            String    @id @default(cuid())
-  url           String
-  cloudinaryId  String
-  width         Int
-  height        Int
-  blurDataUrl   String?
-  alt           String    @default("")
-  order         Int       @default(0)
-  categoryId    String?
-  category      Category? @relation("CategoryPhotos", fields: [categoryId], references: [id], onDelete: SetNull)
-  categoryCover Category? @relation("CategoryCover")
-  projectId     String?
-  project       Project?  @relation("ProjectPhotos", fields: [projectId], references: [id], onDelete: SetNull)
-  projectCover  Project?  @relation("ProjectCover")
-  createdAt     DateTime  @default(now())
+  id               String          @id @default(cuid())
+  url              String
+  cloudinaryId     String
+  width            Int
+  height           Int
+  blurDataUrl      String?
+  alt              String          @default("")
+  order            Int             @default(0)
+  featured         Boolean         @default(false)
+  categoryId       String?
+  category         Category?       @relation("CategoryPhotos", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryCover    Category?       @relation("CategoryCover")
+  projectId        String?
+  project          Project?        @relation("ProjectPhotos", fields: [projectId], references: [id], onDelete: SetNull)
+  projectCover     Project?        @relation("ProjectCover")
+  privateGalleryId String?
+  privateGallery   PrivateGallery? @relation(fields: [privateGalleryId], references: [id], onDelete: SetNull)
+  createdAt        DateTime        @default(now())
 }
 
 model Project {
@@ -93,7 +96,7 @@ model HomeConfig {
   id                 String   @id @default("home")
   heroPhotoId        String?
   heroTitle          String   @default("Christian Sebastián")
-  heroSubtitle        String  @default("Historias que merecen ser recordadas.")
+  heroSubtitle       String   @default("Historias que merecen ser recordadas.")
   heroCtaPrimary     String   @default("Ver portfolio")
   heroCtaSecondary   String   @default("Consultar fecha")
   statsYears         Int      @default(15)
@@ -105,6 +108,9 @@ model HomeConfig {
   testimonialIds     String[] @default([])
   ctaFinalTitle      String   @default("¿Tenés una fecha en mente?")
   ctaFinalText       String   @default("Contame sobre tu evento y armemos algo memorable juntos.")
+  showFeatured       Boolean  @default(true)
+  showUpcoming       Boolean  @default(true)
+  showTestimonials   Boolean  @default(true)
   updatedAt          DateTime @updatedAt
 }
 
@@ -158,7 +164,7 @@ enum LeadStatus {
 }
 
 model Lead {
-  id             String     @id @default(cuid())
+  id             String         @id @default(cuid())
   name           String
   email          String?
   phone          String
@@ -167,14 +173,32 @@ model Lead {
   location       String?
   guestCount     Int?
   message        String?
-  source         LeadSource @default(WEB)
-  status         LeadStatus @default(NEW)
-  estimatedTotal Decimal?   @db.Decimal(10, 2)
+  source         LeadSource     @default(WEB)
+  status         LeadStatus     @default(NEW)
+  estimatedTotal Decimal?       @db.Decimal(10, 2)
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmContent     String?
+  utmTerm        String?
+  internalNotes  String?
+  nextActionAt   DateTime?
+  nextActionNote String?
   clientId       String?
-  client         Client?    @relation(fields: [clientId], references: [id])
+  client         Client?        @relation(fields: [clientId], references: [id])
   quotes         Quote[]
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  activities     LeadActivity[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      String
+  text      String?
+  createdAt DateTime @default(now())
 }
 
 model Client {
@@ -198,22 +222,42 @@ enum EventStatus {
   CANCELLED
 }
 
+enum EventVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum BalanceStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
 model Event {
-  id         String      @id @default(cuid())
-  name       String
-  date       DateTime
-  time       String?
-  location   String?
-  clientId   String?
-  client     Client?     @relation(fields: [clientId], references: [id])
-  categoryId String?
-  category   Category?   @relation(fields: [categoryId], references: [id])
-  projectId  String?     @unique
-  project    Project?    @relation(fields: [projectId], references: [id])
-  status     EventStatus @default(PENDING)
-  notes      String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id              String          @id @default(cuid())
+  name            String
+  date            DateTime
+  time            String?
+  location        String?
+  clientId        String?
+  client          Client?         @relation(fields: [clientId], references: [id])
+  categoryId      String?
+  category        Category?       @relation(fields: [categoryId], references: [id])
+  projectId       String?         @unique
+  project         Project?        @relation(fields: [projectId], references: [id])
+  status          EventStatus     @default(PENDING)
+  visibility      EventVisibility @default(PRIVATE)
+  totalPrice      Decimal?        @db.Decimal(10, 2)
+  depositAmount   Decimal?        @db.Decimal(10, 2)
+  depositPaid     Boolean         @default(false)
+  balanceStatus   BalanceStatus   @default(PENDING)
+  acceptedQuoteId String?         @unique
+  acceptedQuote   Quote?          @relation(fields: [acceptedQuoteId], references: [id])
+  privateGallery  PrivateGallery?
+  notes           String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
 // ─────────────────────────────────────────────
@@ -221,14 +265,14 @@ model Event {
 // ─────────────────────────────────────────────
 
 model Service {
-  id                String   @id @default(cuid())
-  name              String
-  description       String?
-  basePrice         Decimal  @db.Decimal(10, 2)
+  id                  String  @id @default(cuid())
+  name                String
+  description         String?
+  basePrice           Decimal @db.Decimal(10, 2)
   requiresCustomQuote Boolean @default(false)
-  categoryTag       String?
-  active            Boolean  @default(true)
-  order             Int      @default(0)
+  categoryTag         String?
+  active              Boolean @default(true)
+  order               Int     @default(0)
 }
 
 model Extra {
@@ -248,16 +292,18 @@ enum QuoteStatus {
 }
 
 model Quote {
-  id        String      @id @default(cuid())
-  leadId    String?
-  lead      Lead?       @relation(fields: [leadId], references: [id])
-  clientId  String?
-  client    Client?     @relation(fields: [clientId], references: [id])
-  items     Json
-  total     Decimal     @db.Decimal(10, 2)
-  status    QuoteStatus @default(DRAFT)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id         String      @id @default(cuid())
+  leadId     String?
+  lead       Lead?       @relation(fields: [leadId], references: [id])
+  clientId   String?
+  client     Client?     @relation(fields: [clientId], references: [id])
+  items      Json
+  total      Decimal     @db.Decimal(10, 2)
+  status     QuoteStatus @default(DRAFT)
+  validUntil DateTime?
+  event      Event?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 }
 
 // ─────────────────────────────────────────────
@@ -265,15 +311,15 @@ model Quote {
 // ─────────────────────────────────────────────
 
 model Testimonial {
-  id         String  @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
   eventLabel String?
   text       String
   photoUrl   String?
   rating     Int?
-  featured   Boolean @default(false)
-  published  Boolean @default(true)
-  order      Int     @default(0)
+  featured   Boolean  @default(false)
+  published  Boolean  @default(true)
+  order      Int      @default(0)
   createdAt  DateTime @default(now())
 }
 
@@ -290,6 +336,31 @@ model JournalPost {
   seoDescription String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Work zones / Private galleries
+// ─────────────────────────────────────────────
+
+model WorkZone {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PrivateGallery {
+  id              String   @id @default(cuid())
+  token           String   @unique
+  title           String
+  eventId         String?  @unique
+  event           Event?   @relation(fields: [eventId], references: [id])
+  downloadEnabled Boolean  @default(true)
+  photos          Photo[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // ─────────────────────────────────────────────

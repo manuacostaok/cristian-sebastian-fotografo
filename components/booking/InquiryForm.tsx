@@ -7,6 +7,8 @@ import { inquirySchema, type InquiryInput } from "@/lib/validations";
 import { formatDateLong } from "@/lib/utils";
 import { buildWhatsAppLink, inquiryMessage } from "@/lib/whatsapp";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { getStoredUtm } from "@/lib/analytics";
+import { track } from "@/lib/track";
 
 const EVENT_TYPES = ["15 años", "Cumpleaños 18", "Cumpleaños", "Boda", "Evento", "Sesión / Exteriores", "Otro"];
 
@@ -29,9 +31,10 @@ export function InquiryForm({ defaultDate, phoneNumber }: { defaultDate?: string
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, ...getStoredUtm() }),
       });
       if (!res.ok) throw new Error();
+      track("contact_submitted", { eventType: data.eventType });
       setSent(data);
     } catch {
       setError("No pudimos enviar tu consulta. Probá de nuevo o escribinos directamente por WhatsApp.");
@@ -65,6 +68,14 @@ export function InquiryForm({ defaultDate, phoneNumber }: { defaultDate?: string
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 sm:grid-cols-2">
+      <input
+        {...register("website")}
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden"
+      />
       <Field label="Nombre" error={errors.name?.message}>
         <input {...register("name")} className="field" />
       </Field>

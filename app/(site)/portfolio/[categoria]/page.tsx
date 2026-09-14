@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { CategoryNav } from "@/components/portfolio/CategoryNav";
 import { ProjectGrid } from "@/components/portfolio/ProjectGrid";
 import { getCategories, getCategoryBySlug, getProjectsByCategory } from "@/lib/data/content";
+import { TrackPageView } from "@/components/analytics/TrackPageView";
 
 type Params = { categoria: string };
 
@@ -37,6 +38,7 @@ export default async function PortfolioCategoryPage({
 
   return (
     <div className="pt-32 pb-24 sm:pt-40">
+      <TrackPageView type="portfolio_view" meta={{ category: category.slug }} />
       <Container wide>
         <header className="mb-14 max-w-2xl">
           <p className="text-[11px] uppercase tracking-[0.2em] text-paper-muted">Portfolio</p>
