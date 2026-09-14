@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Auth / Users
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  EDITOR
+  PHOTOGRAPHER
+  CLIENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Portfolio
+// ─────────────────────────────────────────────
+
+model Category {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  order         Int       @default(0)
+  active        Boolean   @default(true)
+  coverPhotoId  String?   @unique
+  coverPhoto    Photo?    @relation("CategoryCover", fields: [coverPhotoId], references: [id])
+  projects      Project[]
+  photos        Photo[]   @relation("CategoryPhotos")
+  events        Event[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Photo {
+  id            String    @id @default(cuid())
+  url           String
+  cloudinaryId  String
+  width         Int
+  height        Int
+  blurDataUrl   String?
+  alt           String    @default("")
+  order         Int       @default(0)
+  categoryId    String?
+  category      Category? @relation("CategoryPhotos", fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryCover Category? @relation("CategoryCover")
+  projectId     String?
+  project       Project?  @relation("ProjectPhotos", fields: [projectId], references: [id], onDelete: SetNull)
+  projectCover  Project?  @relation("ProjectCover")
+  createdAt     DateTime  @default(now())
+}
+
+model Project {
+  id           String    @id @default(cuid())
+  title        String
+  slug         String    @unique
+  categoryId   String
+  category     Category  @relation(fields: [categoryId], references: [id])
+  date         DateTime?
+  location     String?
+  description  String?
+  credits      String?
+  coverPhotoId String?   @unique
+  coverPhoto   Photo?    @relation("ProjectCover", fields: [coverPhotoId], references: [id])
+  photos       Photo[]   @relation("ProjectPhotos")
+  featured     Boolean   @default(false)
+  published    Boolean   @default(false)
+  event        Event?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Home CMS (singleton row, id = "home")
+// ─────────────────────────────────────────────
+
+model HomeConfig {
+  id                 String   @id @default("home")
+  heroPhotoId        String?
+  heroTitle          String   @default("Christian Sebastián")
+  heroSubtitle        String  @default("Historias que merecen ser recordadas.")
+  heroCtaPrimary     String   @default("Ver portfolio")
+  heroCtaSecondary   String   @default("Consultar fecha")
+  statsYears         Int      @default(15)
+  statsEvents        Int      @default(300)
+  statsLocation      String   @default("Buenos Aires, Argentina")
+  statsSpecialty     String   @default("15 Años · Cumpleaños · Eventos · Exteriores")
+  featuredProjectIds String[] @default([])
+  upcomingEventId    String?
+  testimonialIds     String[] @default([])
+  ctaFinalTitle      String   @default("¿Tenés una fecha en mente?")
+  ctaFinalText       String   @default("Contame sobre tu evento y armemos algo memorable juntos.")
+  updatedAt          DateTime @updatedAt
+}
+
+model Settings {
+  id             String   @id @default("settings")
+  whatsappNumber String   @default("")
+  instagramUrl   String   @default("")
+  contactEmail   String   @default("")
+  seoTitle       String   @default("Christian Sebastián — Fotógrafo")
+  seoDescription String   @default("")
+  updatedAt      DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Availability / Booking
+// ─────────────────────────────────────────────
+
+enum AvailabilityStatus {
+  AVAILABLE
+  CONSULT
+  BUSY
+}
+
+model AvailabilityDay {
+  id           String             @id @default(cuid())
+  date         DateTime           @unique
+  status       AvailabilityStatus @default(AVAILABLE)
+  internalNote String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// CRM: Leads / Clients / Events / Quotes
+// ─────────────────────────────────────────────
+
+enum LeadSource {
+  INSTAGRAM
+  GOOGLE
+  WHATSAPP
+  WEB
+  DIRECT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTE_SENT
+  CONFIRMED
+  LOST
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  name           String
+  email          String?
+  phone          String
+  eventType      String
+  eventDate      DateTime?
+  location       String?
+  guestCount     Int?
+  message        String?
+  source         LeadSource @default(WEB)
+  status         LeadStatus @default(NEW)
+  estimatedTotal Decimal?   @db.Decimal(10, 2)
+  clientId       String?
+  client         Client?    @relation(fields: [clientId], references: [id])
+  quotes         Quote[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String
+  notes     String?
+  status    String   @default("ACTIVE")
+  leads     Lead[]
+  events    Event[]
+  quotes    Quote[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum EventStatus {
+  PENDING
+  UPCOMING
+  DONE
+  CANCELLED
+}
+
+model Event {
+  id         String      @id @default(cuid())
+  name       String
+  date       DateTime
+  time       String?
+  location   String?
+  clientId   String?
+  client     Client?     @relation(fields: [clientId], references: [id])
+  categoryId String?
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  projectId  String?     @unique
+  project    Project?    @relation(fields: [projectId], references: [id])
+  status     EventStatus @default(PENDING)
+  notes      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Services / Pricing / Quotes
+// ─────────────────────────────────────────────
+
+model Service {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  basePrice         Decimal  @db.Decimal(10, 2)
+  requiresCustomQuote Boolean @default(false)
+  categoryTag       String?
+  active            Boolean  @default(true)
+  order             Int      @default(0)
+}
+
+model Extra {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+  active      Boolean @default(true)
+  order       Int     @default(0)
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  DECLINED
+}
+
+model Quote {
+  id        String      @id @default(cuid())
+  leadId    String?
+  lead      Lead?       @relation(fields: [leadId], references: [id])
+  clientId  String?
+  client    Client?     @relation(fields: [clientId], references: [id])
+  items     Json
+  total     Decimal     @db.Decimal(10, 2)
+  status    QuoteStatus @default(DRAFT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Content: Testimonials / Journal
+// ─────────────────────────────────────────────
+
+model Testimonial {
+  id         String  @id @default(cuid())
+  name       String
+  eventLabel String?
+  text       String
+  photoUrl   String?
+  rating     Int?
+  featured   Boolean @default(false)
+  published  Boolean @default(true)
+  order      Int     @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model JournalPost {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  content        String
+  coverPhotoUrl  String?
+  tags           String[]  @default([])
+  published      Boolean   @default(false)
+  publishedAt    DateTime?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Analytics (lightweight, self-hosted)
+// ─────────────────────────────────────────────
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  type      String
+  source    String?
+  meta      Json?
+  createdAt DateTime @default(now())
+}
