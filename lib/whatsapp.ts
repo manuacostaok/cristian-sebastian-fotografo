@@ -26,3 +26,18 @@ export function portfolioMessage(projectTitle: string) {
 export function generalMessage() {
   return "Hola Christian! Vi tu web y quisiera hacerte una consulta.";
 }
+
+/**
+ * Opens a chat with an arbitrary number (e.g. Christian messaging a lead
+ * back) — unlike buildWhatsAppLink, this does NOT default to the business
+ * number.
+ */
+export function buildWhatsAppLinkTo(phoneNumber: string, message: string) {
+  const digits = phoneNumber.replace(/[^\d]/g, "");
+  const params = new URLSearchParams({ text: message });
+  return `https://wa.me/${digits}?${params.toString()}`;
+}
+
+export function leadFollowUpMessage(leadName: string) {
+  return `Hola ${leadName}! Soy Christian, vi tu consulta y quería contactarte.`;
+}

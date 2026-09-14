@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PageHeader, Table, Th, Td, EmptyState } from "@/components/admin/Page";
 import { LeadStatusSelect } from "@/components/admin/LeadStatusSelect";
 import { prisma } from "@/lib/prisma";
@@ -40,7 +41,11 @@ export default async function LeadsPage() {
           <tbody>
             {leads.map((lead) => (
               <tr key={lead.id}>
-                <Td className="font-medium">{lead.name}</Td>
+                <Td className="font-medium">
+                  <Link href={`/admin/leads/${lead.id}`} className="hover:underline">
+                    {lead.name}
+                  </Link>
+                </Td>
                 <Td>
                   <div className="flex flex-col">
                     <span>{lead.phone}</span>

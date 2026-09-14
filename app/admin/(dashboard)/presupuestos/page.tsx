@@ -29,6 +29,7 @@ export default async function PresupuestosPage() {
               <Th>Total</Th>
               <Th>Estado</Th>
               <Th>Fecha</Th>
+              <Th>{" "}</Th>
             </tr>
           </thead>
           <tbody>
@@ -43,6 +44,16 @@ export default async function PresupuestosPage() {
                     <QuoteStatusSelect id={quote.id} status={quote.status} />
                   </Td>
                   <Td className="text-xs text-paper-muted">{formatDateShort(quote.createdAt)}</Td>
+                  <Td>
+                    <a
+                      href={`/api/quotes/${quote.id}/pdf`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs uppercase tracking-[0.08em] underline"
+                    >
+                      PDF
+                    </a>
+                  </Td>
                 </tr>
               );
             })}
