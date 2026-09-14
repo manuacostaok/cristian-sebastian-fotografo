@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
@@ -64,7 +64,7 @@ export default function SobreMiPage() {
               </ButtonLink>
             </div>
           </div>
-          <PhotoFrame seed="sobre-mi" alt="Christian Sebastián" className="aspect-[4/5] w-full" />
+          <RevealPhoto seed="sobre-mi" alt="Christian Sebastián" className="aspect-[4/5] w-full" />
         </div>
 
         <div className="mt-28 border-t border-paper-line pt-20 sm:mt-36">

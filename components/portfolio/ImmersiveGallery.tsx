@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { cn } from "@/lib/utils";
 import type { PortfolioPhoto } from "@/lib/types";
 
@@ -55,7 +56,7 @@ export function ImmersiveGallery({ photos }: { photos: PortfolioPhoto[] }) {
             )}
             aria-label={`Ampliar: ${photo.alt}`}
           >
-            <PhotoFrame
+            <RevealPhoto
               seed={photo.seed}
               url={photo.url}
               alt={photo.alt}

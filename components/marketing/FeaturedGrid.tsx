@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { formatDateLong } from "@/lib/utils";
 import type { StoryProject, PortfolioCategory } from "@/lib/types";
 
@@ -40,7 +40,7 @@ export function FeaturedGrid({
               href={`/historias/${project.slug}`}
               className={`group relative block overflow-hidden aspect-[4/5] ${SPANS[i % SPANS.length]}`}
             >
-              <PhotoFrame
+              <RevealPhoto
                 seed={project.coverSeed}
                 url={project.coverUrl}
                 alt={project.title}

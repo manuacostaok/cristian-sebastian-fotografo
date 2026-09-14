@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { formatDateLong } from "@/lib/utils";
 import { getJournalPosts } from "@/lib/data/content";
 
@@ -28,7 +28,7 @@ export default async function JournalPage() {
               href={`/journal/${post.slug}`}
               className="group grid gap-6 py-10 sm:grid-cols-[200px_1fr] sm:items-center"
             >
-              <PhotoFrame seed={post.coverSeed} url={post.coverUrl} alt={post.title} className="aspect-[4/3] w-full" />
+              <RevealPhoto seed={post.coverSeed} url={post.coverUrl} alt={post.title} className="aspect-[4/3] w-full" />
               <div>
                 <p className="text-[11px] uppercase tracking-[0.14em] text-paper-muted">
                   {formatDateLong(new Date(post.publishedAt))}

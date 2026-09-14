@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/Container";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { ButtonLink } from "@/components/ui/Button";
 import { formatDateLong } from "@/lib/utils";
 import type { StoryProject } from "@/lib/types";
@@ -11,7 +11,7 @@ export function UpcomingEvent({ project }: { project: StoryProject | null }) {
     <section className="bg-ink py-24 text-paper sm:py-32">
       <Container wide>
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
-          <PhotoFrame
+          <RevealPhoto
             seed={project.coverSeed}
             url={project.coverUrl}
             alt={project.title}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { formatDateLong } from "@/lib/utils";
 import type { StoryProject, PortfolioCategory } from "@/lib/types";
 
@@ -36,7 +36,7 @@ export function ProjectGrid({
           href={`/historias/${project.slug}`}
           className={`group relative block overflow-hidden ${SPANS[i % SPANS.length]}`}
         >
-          <PhotoFrame
+          <RevealPhoto
             seed={project.coverSeed}
             url={project.coverUrl}
             alt={project.title}

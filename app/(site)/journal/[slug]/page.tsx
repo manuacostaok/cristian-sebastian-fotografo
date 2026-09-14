@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
-import { PhotoFrame } from "@/components/ui/PhotoFrame";
+import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { formatDateLong } from "@/lib/utils";
 import { getJournalPostBySlug } from "@/lib/data/content";
 
@@ -31,7 +31,7 @@ export default async function JournalPostPage({ params }: { params: Promise<Para
         </p>
         <h1 className="mt-3 font-display text-4xl sm:text-5xl">{post.title}</h1>
 
-        <PhotoFrame seed={post.coverSeed} url={post.coverUrl} alt={post.title} className="mt-10 aspect-[16/9] w-full" />
+        <RevealPhoto seed={post.coverSeed} url={post.coverUrl} alt={post.title} className="mt-10 aspect-[16/9] w-full" />
 
         <div className="mt-10 max-w-xl text-lg leading-relaxed text-paper-muted">
           <p>{post.content}</p>
