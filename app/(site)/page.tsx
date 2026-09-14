@@ -25,9 +25,9 @@ export default async function HomePage() {
     <>
       <Hero config={config} />
       <StatsBar config={config} />
-      <FeaturedGrid projects={featured} categories={categories} />
-      <UpcomingEvent project={upcoming} />
-      <Testimonials items={testimonials} />
+      {config.showFeatured && <FeaturedGrid projects={featured} categories={categories} />}
+      {config.showUpcoming && <UpcomingEvent project={upcoming} />}
+      {config.showTestimonials && <Testimonials items={testimonials} />}
       <FinalCta config={config} />
     </>
   );

@@ -205,6 +205,9 @@ export const HOME_CONFIG: HomeConfigData = {
   statsSpecialty: "15 Años · Cumpleaños · Eventos · Exteriores",
   ctaFinalTitle: "¿Tenés una fecha en mente?",
   ctaFinalText: "Contame sobre tu evento y armemos juntos algo que se sienta único.",
+  showFeatured: true,
+  showUpcoming: true,
+  showTestimonials: true,
 };
 
 export const JOURNAL_POSTS: JournalPostData[] = [
@@ -350,6 +353,9 @@ export async function getHomeConfig(): Promise<HomeConfigData> {
     statsSpecialty: row.statsSpecialty,
     ctaFinalTitle: row.ctaFinalTitle,
     ctaFinalText: row.ctaFinalText,
+    showFeatured: row.showFeatured,
+    showUpcoming: row.showUpcoming,
+    showTestimonials: row.showTestimonials,
   };
 }
 

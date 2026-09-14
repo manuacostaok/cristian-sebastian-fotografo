@@ -38,6 +38,10 @@ export default async function HomeAdminPage() {
 
           <fieldset className="flex flex-col gap-3">
             <legend className="mb-2 text-[11px] uppercase tracking-[0.14em] text-paper-muted">Destacados</legend>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="showFeatured" defaultChecked={config?.showFeatured ?? true} />
+              Mostrar sección de destacados en el Home
+            </label>
             {projects.length === 0 ? (
               <p className="text-sm text-paper-muted">No hay proyectos publicados todavía.</p>
             ) : (
@@ -57,12 +61,28 @@ export default async function HomeAdminPage() {
 
           <fieldset className="flex flex-col gap-3">
             <legend className="mb-2 text-[11px] uppercase tracking-[0.14em] text-paper-muted">Próximo evento</legend>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="showUpcoming" defaultChecked={config?.showUpcoming ?? true} />
+              Mostrar sección "Próximamente" en el Home
+            </label>
             <select name="upcomingEventId" defaultValue={config?.upcomingEventId ?? ""} className="field">
               <option value="">Ninguno</option>
               {events.map((e) => (
                 <option key={e.id} value={e.id}>{e.name}</option>
               ))}
             </select>
+            <p className="text-xs text-paper-muted">
+              Solo un evento marcado como "Público" en /admin/eventos va a mostrarse acá aunque lo
+              selecciones — nunca se expone un evento privado.
+            </p>
+          </fieldset>
+
+          <fieldset className="flex flex-col gap-3">
+            <legend className="mb-2 text-[11px] uppercase tracking-[0.14em] text-paper-muted">Testimonios</legend>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="showTestimonials" defaultChecked={config?.showTestimonials ?? true} />
+              Mostrar sección de testimonios en el Home
+            </label>
           </fieldset>
 
           <fieldset className="flex flex-col gap-4">

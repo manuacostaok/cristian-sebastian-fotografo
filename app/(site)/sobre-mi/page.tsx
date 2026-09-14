@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { RevealPhoto } from "@/components/ui/RevealPhoto";
 import { ButtonLink } from "@/components/ui/Button";
+import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safe-query";
 
 export const metadata: Metadata = {
   title: "Sobre mí",
@@ -31,7 +33,12 @@ const PROCESS = [
   },
 ];
 
-export default function SobreMiPage() {
+export default async function SobreMiPage() {
+  const zones = await safeQuery(
+    () => prisma.workZone.findMany({ where: { active: true }, orderBy: { order: "asc" } }),
+    [],
+  );
+
   return (
     <div className="pt-32 pb-24 sm:pt-40">
       <Container>
@@ -79,6 +86,13 @@ export default function SobreMiPage() {
             ))}
           </div>
         </div>
+
+        {zones.length > 0 && (
+          <div className="mt-20 border-t border-paper-line pt-12">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-paper-muted">Zonas de cobertura</p>
+            <p className="mt-4 max-w-lg text-paper-muted">{zones.map((z) => z.name).join(" · ")}</p>
+          </div>
+        )}
       </Container>
     </div>
   );

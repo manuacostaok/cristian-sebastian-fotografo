@@ -30,6 +30,7 @@ export async function updatePhoto(formData: FormData) {
     data: {
       categoryId: String(formData.get("categoryId") ?? "") || null,
       alt: String(formData.get("alt") ?? ""),
+      featured: formData.get("featured") === "on",
     },
   });
   revalidatePath("/admin/portfolio/fotos");

@@ -36,6 +36,10 @@ export default async function FotosPage() {
                 ))}
               </select>
               <input name="alt" defaultValue={photo.alt} placeholder="Texto alternativo" className="field text-xs" />
+              <label className="flex items-center gap-2 text-xs">
+                <input type="checkbox" name="featured" defaultChecked={photo.featured} />
+                Destacada
+              </label>
               <div className="flex items-center justify-between">
                 <button type="submit" className="text-xs uppercase tracking-[0.08em] hover:underline">
                   Guardar

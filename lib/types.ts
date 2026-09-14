@@ -75,6 +75,9 @@ export type HomeConfigData = {
   statsSpecialty: string;
   ctaFinalTitle: string;
   ctaFinalText: string;
+  showFeatured: boolean;
+  showUpcoming: boolean;
+  showTestimonials: boolean;
 };
 
 export type AvailabilityStatus = "AVAILABLE" | "CONSULT" | "BUSY";

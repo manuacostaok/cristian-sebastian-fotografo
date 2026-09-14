@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/proyectos", label: "Proyectos" },
   { href: "/admin/eventos", label: "Eventos" },
   { href: "/admin/disponibilidad", label: "Disponibilidad" },
+  { href: "/admin/galerias", label: "Galerías privadas" },
   { href: "/admin/servicios", label: "Servicios" },
   { href: "/admin/precios", label: "Precios / Extras" },
   { href: "/admin/presupuestos", label: "Presupuestos" },
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/admin/clientes", label: "Clientes" },
   { href: "/admin/testimonios", label: "Testimonios" },
   { href: "/admin/journal", label: "Journal" },
+  { href: "/admin/zonas", label: "Zonas de trabajo" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/configuracion", label: "Configuración" },
 ];
