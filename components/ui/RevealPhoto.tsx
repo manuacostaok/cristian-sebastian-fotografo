@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { animate } from "animejs";
+import { useEffect, useState } from "react";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { cn } from "@/lib/utils";
 
 /**
- * Cinematic photo reveal: an SVG curtain wipes away (anime.js) as the photo
- * settles in from a slight zoom, triggered once when it scrolls into view.
- * Used everywhere a photo appears in a grid/story so the site's motion
- * language stays consistent — never on the Hero (that one loads instantly).
+ * Cinematic photo reveal: a curtain wipes away as the photo settles in from
+ * a slight zoom. Plays automatically shortly after mount via a plain CSS
+ * transition — no IntersectionObserver, no requestAnimationFrame-driven JS
+ * animation library. Both of those turned out to be fragile: a photo is the
+ * whole point of this site, and a scroll-triggered or rAF-driven reveal can
+ * stay stuck mid-animation in some browser/tab states (backgrounded tabs,
+ * automated test panes) since neither IntersectionObserver callbacks nor
+ * rAF ticks are guaranteed to fire promptly. A bare setTimeout always does.
+ *
+ * Uses inline styles (not Tailwind's scale utility classes) for the
+ * transform itself — Tailwind v4's transform utilities compose through CSS
+ * custom properties that didn't reliably resolve to an actual `scale` here;
+ * an inline style leaves nothing to that ambiguity.
  */
 export function RevealPhoto({
   seed,
@@ -26,73 +34,29 @@ export function RevealPhoto({
   className?: string;
   sizes?: string;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const photoRef = useRef<HTMLDivElement>(null);
-  const rectRef = useRef<SVGRectElement>(null);
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    const container = containerRef.current;
-    const photo = photoRef.current;
-    const rect = rectRef.current;
-    if (!container || !photo || !rect) return;
-
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
-      rect.style.display = "none";
-      photo.style.opacity = "1";
-      return;
-    }
-
-    let animated = false;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting || animated) continue;
-          animated = true;
-
-          animate(rect, {
-            scaleX: [1, 0],
-            duration: 900,
-            ease: "inOutQuart",
-          });
-          animate(photo, {
-            scale: [1.08, 1],
-            opacity: [0, 1],
-            duration: 1100,
-            delay: 120,
-            ease: "outQuart",
-          });
-          observer.unobserve(container);
-        }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
-    );
-
-    observer.observe(container);
-    return () => observer.disconnect();
+    // A short delay lets the browser paint the initial (covered) state at
+    // least once before switching classes — otherwise the two states can
+    // get coalesced into a single paint and the transition never shows.
+    const timer = setTimeout(() => setRevealed(true), 80);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div ref={containerRef} className={cn("relative overflow-hidden", className)}>
-      <div ref={photoRef} className="absolute inset-0 h-full w-full opacity-0">
+    <div className={cn("relative overflow-hidden", className)}>
+      <div
+        className="absolute inset-0 h-full w-full transition-[transform,opacity] duration-1000 ease-[var(--ease-editorial)] motion-reduce:transition-none motion-reduce:opacity-100! motion-reduce:scale-100!"
+        style={{ transform: revealed ? "scale(1)" : "scale(1.08)", opacity: revealed ? 1 : 0 }}
+      >
         <PhotoFrame seed={seed} url={url} alt={alt} label={label} sizes={sizes} className="h-full w-full" />
       </div>
-      <svg
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
+      <div
         aria-hidden="true"
-      >
-        <rect
-          ref={rectRef}
-          x="0"
-          y="0"
-          width="100"
-          height="100"
-          className="fill-ink"
-          style={{ transformBox: "fill-box", transformOrigin: "100% 50%" }}
-        />
-      </svg>
+        className="pointer-events-none absolute inset-0 h-full w-full bg-ink transition-transform duration-700 ease-[var(--ease-editorial)] motion-reduce:hidden"
+        style={{ transform: revealed ? "scaleX(0)" : "scaleX(1)", transformOrigin: "right center" }}
+      />
     </div>
   );
 }
