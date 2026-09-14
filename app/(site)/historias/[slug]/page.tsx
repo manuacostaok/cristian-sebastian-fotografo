@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { ImmersiveGallery } from "@/components/portfolio/ImmersiveGallery";
+import { BookViewer } from "@/components/book/BookViewer";
 import { WhatsAppCtaLink } from "@/components/marketing/WhatsAppCtaLink";
 import { TrackPageView } from "@/components/analytics/TrackPageView";
 import { formatDateLong } from "@/lib/utils";
@@ -74,6 +75,18 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
             <WhatsAppCtaLink href={whatsappHref} variant="solid" context={`historia:${project.slug}`}>
               Quiero algo así
             </WhatsAppCtaLink>
+            {project.photos.length > 0 && (
+              <BookViewer
+                project={{
+                  title: project.title,
+                  date: project.date,
+                  location: project.location,
+                  description: project.description,
+                  credits: project.credits,
+                  photos: project.photos,
+                }}
+              />
+            )}
             {project.credits && (
               <p className="text-xs text-paper-muted lg:text-right">{project.credits}</p>
             )}
